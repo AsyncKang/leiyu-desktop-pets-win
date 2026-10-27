@@ -1,0 +1,37 @@
+name: Build Windows EXE
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "windows/**"
+      - "Assets/clips.json"
+      - "Assets/clips-helium.json"
+      - "Assets/pairs.json"
+      - "Assets/Clips/**"
+      - "Assets/Clips-helium/**"
+      - "Assets/lei.png"
+      - "Assets/yu.png"
+      - ".github/workflows/build-windows.yml"
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r windows/requirements.txt
+      - name: Build EXE
+        working-directory: windows
+        run: pyinstaller --noconfirm leiyu_pet.spec
+      - name: Upload EXE
+        uses: actions/upload-artifact@v4
+        with:
+          name: LeiYu-Desktop-Pets-Windows
+          path: windows/dist/*.exe
+          if-no-files-found: error
